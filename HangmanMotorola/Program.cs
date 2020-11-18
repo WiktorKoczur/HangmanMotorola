@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System;
+using System.IO;
+using System.Reflection;
 using System.Text;
 
 namespace HangmanMotorola
@@ -8,15 +10,19 @@ namespace HangmanMotorola
     {
         static void Main(string[] args)
         {
-            List<string> countryAndCapital = new List<string>();
-            countryAndCapital.Add("Afghanistan | Kabul");
-            countryAndCapital.Add("Albania | Tirana");
-
+            string[] files = LoadDataFile();
+            
+            var countryAndCapital = new List<string>(files);
+            
             var rand = new Random();
-            int chosenCountryNumber = rand.Next(2);
+            int chosenCountryNumber = rand.Next(Int32.MaxValue) % files.Length;
             int playerLifePoints = 5;
+            
+            Console.WriteLine(countryAndCapital[chosenCountryNumber]);
 
-            Console.WriteLine("Hangman game! Guess a capital of a random country. Each dash represents a letter of random capital city.  You have for a start " + playerLifePoints + " life points.");
+            Console.WriteLine(
+                "Hangman game! Guess a capital of a random country. Each dash represents a letter of random capital city.  You have for a start " +
+                playerLifePoints + " life points.");
 
 
             string stringCountry = countryAndCapital[chosenCountryNumber];
@@ -26,38 +32,44 @@ namespace HangmanMotorola
             char[] lettersOfCapital = new char[stringCountry.Length];
             char[] dashesOfCapital = new char[stringCountry.Length];
 
-            StringBuilder theCountry = new StringBuilder();
-            StringBuilder theCapital = new StringBuilder();
-            StringBuilder misses = new StringBuilder();
+            var theCountry = new StringBuilder();
+            var theCapital = new StringBuilder();
+            var misses = new StringBuilder();
 
             //taking names of countries and capitals from file to variables
-            fileNamesConversion(stringCountry, lettersOfCountries, lettersOfCapital, dashesOfCapital, theCountry, theCapital);
+            FileNamesConversion(stringCountry, lettersOfCountries, lettersOfCapital, dashesOfCapital, theCountry,
+                theCapital);
 
             //showing dashes of a capital
-            dashes(dashesOfCapital);
+            Dashes(dashesOfCapital);
 
             Console.WriteLine("Would you like to guess a letter or a whole word? Enter a word or a letter: ");
 
             //guessing game logic
-            guessingLetters(playerLifePoints, theCapital, misses, theCountry, lettersOfCapital, dashesOfCapital);
+            GuessingLetters(playerLifePoints, theCapital, misses, theCountry, lettersOfCapital, dashesOfCapital);
+        }
+
+        private static string[] LoadDataFile()
+        {
+            return File.ReadAllLines(@"C:\Users\Wiktor\RiderProjects\HangmanMotorola\HangmanMotorola\resources\countries_and_capitals.txt");
         }
 
 
-        public static void fileNamesConversion(string stringCountry, char[] lettersOfCountries, char[] lettersOfCapital, char[]
-            dashesOfCapital, StringBuilder theCountry, StringBuilder theCapital){
-
+        private static void FileNamesConversion(string stringCountry, char[] lettersOfCountries, char[] lettersOfCapital,
+            char[] dashesOfCapital, StringBuilder theCountry, StringBuilder theCapital)
+        {
             int count = 0;
             bool flag = true;
 
             foreach (char c in stringCountry)
             {
-
                 if (c == ' ' || c == '|')
                 {
                     flag = false;
                     count = 0;
                     continue;
                 }
+
                 if (flag)
                 {
                     lettersOfCountries[count] = c;
@@ -76,8 +88,9 @@ namespace HangmanMotorola
             }
         }
 
-        public static void guessingLetters(int playerLifePoints, StringBuilder theCapital, StringBuilder misses, 
-            StringBuilder theCountry, char[] lettersOfCapital, char[] dashesOfCapital){
+        private static void GuessingLetters(int playerLifePoints, StringBuilder theCapital, StringBuilder misses,
+            StringBuilder theCountry, char[] lettersOfCapital, char[] dashesOfCapital)
+        {
             while (playerLifePoints > 0)
             {
                 var letterOrWord = Console.ReadLine();
@@ -96,18 +109,20 @@ namespace HangmanMotorola
                             anotherFlag = true;
                         }
                     }
+
                     if (letterOrWord.Length > 1 && (anotherFlag == false))
                     {
                         playerLifePoints -= 2;
                         if (playerLifePoints == 1)
                         {
-                            Console.WriteLine("Be careful, that's your life point. A little Hint: The capital of " + theCountry);
+                            Console.WriteLine("Be careful, that's your life point. A little Hint: The capital of " +
+                                              theCountry);
                         }
+
                         break;
                     }
                     else if (anotherFlag == false)
                     {
-
                         playerLifePoints -= 1;
                         if (playerLifePoints > 0)
                         {
@@ -117,30 +132,31 @@ namespace HangmanMotorola
 
                         if (playerLifePoints == 1)
                         {
-                            Console.WriteLine("Be careful, that's your life point. A little Hint: The capital of " + theCountry);
+                            Console.WriteLine("Be careful, that's your life point. A little Hint: The capital of " +
+                                              theCountry);
                         }
                     }
                 }
 
-                dashes(dashesOfCapital);
+                Dashes(dashesOfCapital);
                 Console.WriteLine("After this round your life points = " + playerLifePoints);
                 Console.WriteLine();
-                decideWinnerOrLoser(theCapital, dashesOfCapital, playerLifePoints);
-
+                DecideWinnerOrLoser(theCapital, dashesOfCapital, playerLifePoints);
             }
-
         }
 
 
         //nie dziala
-        public static void decideWinnerOrLoser(StringBuilder theCapital, char[] dashesOfCapital, int playerLifePoints){
-            
-            if ((playerLifePoints > 0) && theCapital.Equals(dashesOfCapital)){ 
+        private static void DecideWinnerOrLoser(StringBuilder theCapital, char[] dashesOfCapital, int playerLifePoints)
+        {
+            if ((playerLifePoints > 0) && theCapital.Equals(dashesOfCapital))
+            {
                 Console.WriteLine("Congratulation, you're the winner. You guessed correctly.");
                 Console.WriteLine();
                 Console.WriteLine("Do you want to play again?");
             }
-            else if (playerLifePoints <= 0){
+            else if (playerLifePoints <= 0)
+            {
                 Console.WriteLine("Unfortunately you haven't guess the capital");
                 Console.WriteLine();
                 Console.WriteLine("Do you want to play again?");
@@ -148,14 +164,15 @@ namespace HangmanMotorola
         }
 
         //writing dashes
-        public static void dashes(char[] dashesOfCapital)
+        private static void Dashes(char[] dashesOfCapital)
         {
-                for (int i = 0; i < dashesOfCapital.Length; i++)
-                {
-                    Console.Write(dashesOfCapital[i]+ " ");
-                }
-                Console.WriteLine();
-                Console.WriteLine();
+            foreach (var t in dashesOfCapital)
+            {
+                Console.Write(t + " ");
+            }
+
+            Console.WriteLine();
+            Console.WriteLine();
         }
     }
 }
