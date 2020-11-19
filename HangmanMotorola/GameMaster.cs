@@ -20,7 +20,7 @@ namespace HangmanMotorola
 
         public void PrintHint()
         {
-            if (player.LifePoints != 1)
+            if (player.LifePoints == 1)
             {
                 Console.WriteLine("Hint -> Country name " + chosenCountry.CountryName);
             } 
@@ -42,6 +42,13 @@ namespace HangmanMotorola
             Console.WriteLine();
         }
 
+        public void AddScore()
+        {
+            Console.WriteLine("Add score in the following order:" +
+                              " name| date | guessing_time | guessing_tries |guessed_word");
+        }
+        
+
         public void PrintGameMenu()
         {
             PrintAvailableOptions();
@@ -52,7 +59,7 @@ namespace HangmanMotorola
         {
             Console.WriteLine("1. restart");
             Console.WriteLine("2. exit");
-            Console.WriteLine("3. high scores");
+            Console.WriteLine("3. Add a high scores");
         }
 
         public void PrintGameState()
@@ -62,17 +69,51 @@ namespace HangmanMotorola
                 case GameState.WIN:
                     Console.Clear();
                     Console.WriteLine("You won! Capital of " + chosenCountry.CountryName + " is " + chosenCountry.Capital);
+                    Console.WriteLine("Your number of tries = " + player.NumberOfTries);
                     Console.WriteLine("Please choose one of the below options to proceed");
                     PrintAvailableOptions();
                     break;
                 case GameState.LOSE:
                     Console.Clear();
                     Console.WriteLine("You lose! Capital of " + chosenCountry.CountryName + " is " + chosenCountry.Capital);
+                    Console.WriteLine("Your number of tries = " + player.NumberOfTries);
                     Console.WriteLine("Please choose one of the below options to proceed");
                     PrintAvailableOptions();
                     break;
             }
         }
+
+        public void PaintHangman(int lifePoints)
+        {
+            switch (lifePoints)
+            {
+                case 6:
+                    Console.WriteLine("   +---+\n  |   |\n  O   |\n      |\n      |\n      |\n=========");
+                    break;
+                case 5:
+                    Console.WriteLine("   +---+\n  |   |\n  O   |\n  |   |\n      |\n      |\n=========");
+                    break;
+                case 4:
+                    Console.WriteLine("   +---+\n  |   |\n  O   |\n  |   |\n      |\n      |\n=========");
+                    break;
+                case 3: 
+                    Console.WriteLine("   +---+\n  |   |\n  O   |\n /|   |\n      |\n      |\n=========");
+                    break;
+                case 2:
+                    Console.WriteLine("   +---+\n  |   |\n  O   |\n /|\\  |\n      |\n      |\n=========");
+                    break;
+                case 1:
+                    Console.WriteLine("   +---+\n  |   |\n  O   |\n /|\\  |\n /    |\n      |\n=========");
+                    break;
+                case 0:
+                    Console.WriteLine("   +---+\n  |   |\n  O   |\n /|\\  |\n / \\  |\n      |\n=========");
+                    break;
+                default:
+                    Console.WriteLine("   +---+\n  |   |\n      |\n      |\n      |\n      |\n=========");
+                    break;
+            }
+        }
+
 
         public void PrintMisses()
         {
@@ -86,9 +127,10 @@ namespace HangmanMotorola
 
         public void AddInput(string input)
         {
+            player.NumberOfTries++;
+
             if (input.Length == 1)
             {
-
                 if (correctInputs.Contains(input) || missesInputs.Contains(input))
                     return;
 
@@ -106,7 +148,7 @@ namespace HangmanMotorola
             else {
                 if (input.Trim().Equals(chosenCountry.Capital.ToLower()))
                     gameState = GameState.WIN;
-                else 
+                else
                     player.LifePoints -= 2;
             }
 
@@ -124,6 +166,5 @@ namespace HangmanMotorola
 
             return true;
         }
-        
     }
 }

@@ -14,6 +14,7 @@ namespace HangmanMotorola
             var chosenCountry = ChooseCountry(countries);
             var player = new Player();
             var gameMaster = new GameMaster(chosenCountry, player);
+            
 
             while (true)
             {
@@ -24,7 +25,8 @@ namespace HangmanMotorola
                 gameMaster.PrintCurrentGuessState();
                 gameMaster.PrintGameMenu();
                 gameMaster.PrintGameState();
-
+                gameMaster.PaintHangman(player.LifePoints);
+                
                 string input = Console.ReadLine();
                 
                 gameMaster.AddInput(input.ToLower());
@@ -40,11 +42,27 @@ namespace HangmanMotorola
                 {
                     break;
                 }
-                
+
+                if (input.Equals("3"))
+                {
+                    gameMaster.AddScore();
+                    var environment = System.Environment.CurrentDirectory;
+                    string projectDirectory = Directory.GetParent(environment).Parent.Parent.FullName;
+                    
+                    string newInput = Console.ReadLine();
+                    using System.IO.StreamWriter file =
+                        new System.IO.StreamWriter(projectDirectory + "/resources/out.txt", true);
+                    file.WriteLine(newInput);
+
+                    chosenCountry = ChooseCountry(countries);
+                    player = new Player();
+                    gameMaster = new GameMaster(chosenCountry, player);
+                }
+
                 Console.Clear();
             }
         }
-
+        
         private static Country ChooseCountry(List<Country> countries)
         {
             var rand = new Random();
@@ -55,7 +73,7 @@ namespace HangmanMotorola
 
         private static List<Country> LoadCountries()
         {
-            string[] files = LoadDataFile("countries_and_capitals.txt");
+            string[] files = LoadDataFile("resources/countries_and_capitals.txt");
             
             var countryAndCapital = new List<string>(files);
 
@@ -70,7 +88,11 @@ namespace HangmanMotorola
         
         private static string[] LoadDataFile(string fileName)
         {
-            return File.ReadAllLines(@"C:\Users\Wiktor\RiderProjects\HangmanMotorola\HangmanMotorola\resources\" + fileName);
+            var environment = System.Environment.CurrentDirectory;
+            string projectDirectory = Directory.GetParent(environment).Parent.Parent.FullName;
+            return File.ReadAllLines(Path.Combine(projectDirectory, fileName));
+            //return File.ReadAllLines(@"C:\Users\Wiktor\RiderProjects\HangmanMotorola\HangmanMotorola\resources\" + fileName);
         }
     }
 }
+
