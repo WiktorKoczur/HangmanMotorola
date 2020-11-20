@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
+
 namespace HangmanMotorola
 {
     public class GameMaster
@@ -10,7 +11,7 @@ namespace HangmanMotorola
         private List<string> correctInputs = new List<string>();
         private List<string> missesInputs = new List<string>();
         private GameState gameState = GameState.PLAYING;
-        
+
         public GameMaster(Country chosenCountry, Player player)
         {
             this.chosenCountry = chosenCountry;
@@ -23,15 +24,16 @@ namespace HangmanMotorola
             if (player.LifePoints == 1)
             {
                 Console.WriteLine("Hint -> Country name " + chosenCountry.CountryName);
-            } 
+            }
         }
+
         public void PrintDescription()
         {
             Console.WriteLine(
                 "Hangman game! Guess a capital of a random country. Each dash represents a letter of random capital city.  You have " +
                 player.LifePoints + " life points.");
         }
-        
+
         public void PrintCurrentGuessState()
         {
             foreach (var c in chosenCountry.Capital)
@@ -39,6 +41,7 @@ namespace HangmanMotorola
                 var toPrint = correctInputs.Contains(c.ToString().ToLower()) ? c : '_';
                 Console.Write(toPrint);
             }
+
             Console.WriteLine();
         }
 
@@ -47,7 +50,17 @@ namespace HangmanMotorola
             Console.WriteLine("Add score in the following order:" +
                               " name| date | guessing_time | guessing_tries |guessed_word");
         }
-        
+
+        public void CurrentTime()
+        {
+            player.StartTime = DateTime.Now;
+        }
+
+        private void MeasureTime(DateTime startTime)
+        {
+            var timerValue = DateTime.Now - startTime;
+            player.Time = timerValue.Seconds;
+        }
 
         public void PrintGameMenu()
         {
@@ -67,25 +80,29 @@ namespace HangmanMotorola
             switch (gameState)
             {
                 case GameState.WIN:
+                    MeasureTime(player.StartTime);
                     Console.Clear();
                     Console.WriteLine("You won! Capital of " + chosenCountry.CountryName + " is " + chosenCountry.Capital);
                     Console.WriteLine("Your number of tries = " + player.NumberOfTries);
+                    Console.WriteLine("Your guessing time was " + player.Time + " seconds");
                     Console.WriteLine("Please choose one of the below options to proceed");
                     PrintAvailableOptions();
                     break;
                 case GameState.LOSE:
+                    MeasureTime(player.StartTime);
                     Console.Clear();
                     Console.WriteLine("You lose! Capital of " + chosenCountry.CountryName + " is " + chosenCountry.Capital);
                     Console.WriteLine("Your number of tries = " + player.NumberOfTries);
+                    Console.WriteLine("Your guessing time was " + player.Time + " seconds");
                     Console.WriteLine("Please choose one of the below options to proceed");
                     PrintAvailableOptions();
                     break;
             }
         }
 
-        public void PaintHangman(int lifePoints)
+        public void PaintHangman()
         {
-            switch (lifePoints)
+            switch (player.LifePoints)
             {
                 case 6:
                     Console.WriteLine("   +---+\n  |   |\n  O   |\n      |\n      |\n      |\n=========");
@@ -114,6 +131,7 @@ namespace HangmanMotorola
             }
         }
 
+        
 
         public void PrintMisses()
         {
@@ -124,10 +142,15 @@ namespace HangmanMotorola
             }
             Console.WriteLine();
         }
+        
+        private void NumberOfTries()
+        {
+            player.NumberOfTries++;
+        }
 
         public void AddInput(string input)
         {
-            player.NumberOfTries++;
+            NumberOfTries();
 
             if (input.Length == 1)
             {
@@ -146,13 +169,13 @@ namespace HangmanMotorola
                 }
             }
             else {
-                if (input.Trim().Equals(chosenCountry.Capital.ToLower()))
-                    gameState = GameState.WIN;
+                if (input.Trim().Equals(chosenCountry.Capital.ToLower())) gameState = GameState.WIN;
                 else
                     player.LifePoints -= 2;
             }
 
             if (player.LifePoints <= 0) gameState = GameState.LOSE;
+            
             
             correctInputs.Add(input.ToLower());
         }
@@ -163,7 +186,6 @@ namespace HangmanMotorola
             {
                 if (!correctInputs.Contains(i.ToString())) return false;
             }
-
             return true;
         }
     }

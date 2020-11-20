@@ -14,21 +14,21 @@ namespace HangmanMotorola
             var chosenCountry = ChooseCountry(countries);
             var player = new Player();
             var gameMaster = new GameMaster(chosenCountry, player);
-            
+            gameMaster.CurrentTime();
 
             while (true)
             {
-
                 gameMaster.PrintHint();
                 gameMaster.PrintDescription();
                 gameMaster.PrintMisses();
                 gameMaster.PrintCurrentGuessState();
                 gameMaster.PrintGameMenu();
                 gameMaster.PrintGameState();
-                gameMaster.PaintHangman(player.LifePoints);
+                gameMaster.PaintHangman();
+
                 
                 string input = Console.ReadLine();
-                
+
                 gameMaster.AddInput(input.ToLower());
                 
                 if (input.Equals("1"))
@@ -36,6 +36,7 @@ namespace HangmanMotorola
                     chosenCountry = ChooseCountry(countries);
                     player = new Player();
                     gameMaster = new GameMaster(chosenCountry, player);
+                    gameMaster.CurrentTime();
                 }
 
                 if (input.Equals("2"))
@@ -57,6 +58,7 @@ namespace HangmanMotorola
                     chosenCountry = ChooseCountry(countries);
                     player = new Player();
                     gameMaster = new GameMaster(chosenCountry, player);
+                    gameMaster.CurrentTime();
                 }
 
                 Console.Clear();
